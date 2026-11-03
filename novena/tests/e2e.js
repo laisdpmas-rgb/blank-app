@@ -208,7 +208,7 @@ const EXPECTED_OPENING = [
   await p2.locator('[data-action="open-display"]').click();
   await p2.locator('[data-action="font-up"]').click();
   await p2.locator('[data-action="theme"][data-value="dark"]').click();
-  check((await p2.evaluate(() => document.documentElement.dataset.theme)) === 'dark', 'modo noturno');
+  check((await p2.evaluate(() => document.documentElement.dataset.appTheme)) === 'dark', 'modo noturno');
   if (SHOTS) await p2.screenshot({ path: `${SHOTS}/08-noturno-ajustes.png` });
   await p2.locator('[data-action="close-modal"]').click();
   if (SHOTS) await p2.screenshot({ path: `${SHOTS}/09-noturno.png` });

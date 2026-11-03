@@ -9,6 +9,9 @@
    1. Estado e armazenamento
    --------------------------------------------------------- */
 const STORAGE_KEY = 'novena-ns-gracas:v1';
+/* Versão publicada como artefato do Claude: sem impressão, downloads ou instalação */
+const EMBED = !!window.NOVENA_EMBED;
+const NS_IMG = window.NOVENA_IMG || 'img/nossa-senhora.svg';
 const FONT_LEVELS = [1, 1.125, 1.25, 1.4, 1.6];
 
 function defaultState() {
@@ -203,15 +206,17 @@ function stepShortName(step, session) {
 function applySettings() {
   const s = state.settings;
   const root = document.documentElement;
-  if (s.theme === 'auto') root.removeAttribute('data-theme');
-  else root.setAttribute('data-theme', s.theme);
+  if (s.theme === 'auto') root.removeAttribute('data-app-theme');
+  else root.setAttribute('data-app-theme', s.theme);
   root.style.setProperty('--font-scale', FONT_LEVELS[s.font] || 1);
   root.classList.toggle('spacious', !!s.spacious);
   root.classList.toggle('clean', !!s.clean);
 
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    const dark = s.theme === 'dark' || (s.theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const hostTheme = root.getAttribute('data-theme');
+    const autoDark = hostTheme ? hostTheme === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const dark = s.theme === 'dark' || (s.theme === 'auto' && autoDark);
     meta.setAttribute('content', dark ? '#121a28' : (s.theme === 'paper' ? '#f4ecdd' : '#fbf8f2'));
   }
 }
@@ -409,11 +414,11 @@ function releaseWakeLock() {
 /* ---------------------------------------------------------
    8. Telas
    --------------------------------------------------------- */
-function topBar(backHref = '#/', backLabel = 'Início', title = '') {
+function topBar(backHref = '#inicio', backLabel = 'Início', title = '') {
   return `<header class="topbar">
     <a class="back-link" href="${backHref}"><span aria-hidden="true">‹</span> ${esc(backLabel)}</a>
     ${title ? `<span class="topbar-title">${esc(title)}</span>` : '<span></span>'}
-    <a class="icon-link" href="#/ajustes" aria-label="Ajustes"><span aria-hidden="true">Aa</span></a>
+    <a class="icon-link" href="#ajustes" aria-label="Ajustes"><span aria-hidden="true">Aa</span></a>
   </header>`;
 }
 
@@ -448,20 +453,20 @@ function viewHome() {
   let actions;
   if (!cur) {
     actions = `<p class="lead-note">Você concluiu os nove dias da sua novena. Que Nossa Senhora das Graças continue acompanhando você.</p>
-      <a class="btn btn-primary btn-block btn-big" href="#/dias">VER MEUS NOVE DIAS</a>`;
+      <a class="btn btn-primary btn-block btn-big" href="#dias">VER MEUS NOVE DIAS</a>`;
   } else if (!started) {
-    actions = `<a class="btn btn-primary btn-block btn-big" href="#/dia/1">COMEÇAR MINHA NOVENA</a>`;
+    actions = `<a class="btn btn-primary btn-block btn-big" href="#dia-1">COMEÇAR MINHA NOVENA</a>`;
   } else {
     actions = `<button class="btn btn-primary btn-block btn-big" data-action="resume">
         CONTINUAR DE ONDE PAREI
         <small>${esc(resumeHint)}</small>
       </button>
-      <a class="btn btn-secondary btn-block" href="#/dias">Ver meus nove dias</a>`;
+      <a class="btn btn-secondary btn-block" href="#dias">Ver meus nove dias</a>`;
   }
 
   return `<main class="page home" id="main">
     <figure class="hero">
-      <img src="img/nossa-senhora.svg" width="240" height="300"
+      <img src="${NS_IMG}" width="240" height="300"
         alt="Ilustração delicada de Nossa Senhora das Graças, de manto azul e braços abertos, com raios de luz saindo de suas mãos.">
     </figure>
     <h1 class="home-title" tabindex="-1">Minha Novena de Nossa Senhora das Graças</h1>
@@ -474,10 +479,10 @@ function viewHome() {
     </section>
     <div class="actions">${actions}</div>
     <nav class="home-links" aria-label="Outras áreas">
-      <a href="#/terco" class="home-link"><span class="hl-icon" aria-hidden="true">${ICONS.rosary}</span><span>Terço Mariano</span></a>
-      <a href="#/intencoes" class="home-link"><span class="hl-icon" aria-hidden="true">${ICONS.heart}</span><span>Minhas intenções</span></a>
-      <a href="#/oracoes" class="home-link"><span class="hl-icon" aria-hidden="true">${ICONS.book}</span><span>Orações</span></a>
-      <a href="#/ajustes" class="home-link"><span class="hl-icon" aria-hidden="true">${ICONS.gear}</span><span>Ajustes</span></a>
+      <a href="#terco" class="home-link"><span class="hl-icon" aria-hidden="true">${ICONS.rosary}</span><span>Terço Mariano</span></a>
+      <a href="#intencoes" class="home-link"><span class="hl-icon" aria-hidden="true">${ICONS.heart}</span><span>Minhas intenções</span></a>
+      <a href="#oracoes" class="home-link"><span class="hl-icon" aria-hidden="true">${ICONS.book}</span><span>Orações</span></a>
+      <a href="#ajustes" class="home-link"><span class="hl-icon" aria-hidden="true">${ICONS.gear}</span><span>Ajustes</span></a>
     </nav>
   </main>`;
 }
@@ -502,14 +507,14 @@ function viewDays() {
     else if (d.n === cur) status = `<span class="badge current">${inProgress ? 'Dia atual · em andamento' : 'Dia atual'}</span>`;
     else if (d.n === next) status = `<span class="badge">${inProgress ? 'Próximo · em andamento' : 'Próximo dia'}</span>`;
     else if (inProgress) status = `<span class="badge">Em andamento</span>`;
-    return `<li><a class="day-item ${st.done ? 'is-done' : ''} ${d.n === cur ? 'is-current' : ''}" href="#/dia/${d.n}">
+    return `<li><a class="day-item ${st.done ? 'is-done' : ''} ${d.n === cur ? 'is-current' : ''}" href="#dia-${d.n}">
       <span class="day-num" aria-hidden="true">${st.done ? '✓' : d.n}</span>
       <span class="day-info"><span class="day-name">Dia ${d.n} · ${esc(d.title)}</span>${status}</span>
       <span class="chev" aria-hidden="true">›</span>
     </a></li>`;
   }).join('');
 
-  return `${topBar('#/', 'Início')}
+  return `${topBar('#inicio', 'Início')}
   <main class="page" id="main">
     <h1 tabindex="-1">Meus nove dias</h1>
     <section class="progress-card">
@@ -560,7 +565,7 @@ function viewDay(n) {
       ${st.done ? 'REZAR ESTE DIA NOVAMENTE' : 'INICIAR A ORAÇÃO'}</button>`;
   }
 
-  return `${topBar('#/dias', 'Nove dias', `Dia ${n} de 9`)}
+  return `${topBar('#dias', 'Nove dias', `Dia ${n} de 9`)}
   <main class="page day" id="main">
     <p class="eyebrow">Dia ${n} de 9 ${st.done ? '· <span class="done-text">Concluído ✓</span>' : ''}</p>
     <h1 tabindex="-1">${esc(d.title)}</h1>
@@ -598,7 +603,7 @@ function viewTerco() {
        <button class="btn btn-text" data-action="restart-session" data-key="terco">Recomeçar o terço do início</button>`
     : `<button class="btn btn-primary btn-block btn-big" data-action="start-terco">REZAR O TERÇO</button>`;
 
-  return `${topBar('#/', 'Início', 'Terço Mariano')}
+  return `${topBar('#inicio', 'Início', 'Terço Mariano')}
   <main class="page" id="main">
     <h1 tabindex="-1">Terço Mariano</h1>
     <p class="subtitle">Cinco mistérios, um de cada vez. O aplicativo conta as Ave-Marias por você.</p>
@@ -612,7 +617,7 @@ function viewTerco() {
       </ol>
     </section>
     <div class="actions sticky-actions">${actions}</div>
-    <p class="hint center">A Jaculatória de Fátima pode ser ativada ou desativada em <a href="#/ajustes">Ajustes</a>.</p>
+    <p class="hint center">A Jaculatória de Fátima pode ser ativada ou desativada em <a href="#ajustes">Ajustes</a>.</p>
   </main>`;
 }
 
@@ -626,7 +631,7 @@ function segmentTracker(step, session) {
 function viewFlow(key) {
   const session = state.sessions[key];
   if (!session) {
-    location.replace(key === 'terco' ? '#/terco' : `#/dia/${key.slice(1)}`);
+    location.replace(key === 'terco' ? '#terco' : `#dia-${key.slice(1)}`);
     return '';
   }
   const steps = buildSteps(session);
@@ -739,7 +744,7 @@ function viewDone(which) {
       ${ORNAMENT}
       <h1 tabindex="-1">Terço concluído</h1>
       <p class="done-message">Obrigado por este momento de oração. Que Nossa Senhora acompanhe você.</p>
-      <div class="actions"><a class="btn btn-primary btn-block btn-big" href="#/">VOLTAR AO INÍCIO</a></div>
+      <div class="actions"><a class="btn btn-primary btn-block btn-big" href="#inicio">VOLTAR AO INÍCIO</a></div>
     </main>`;
   }
   const n = parseInt(which, 10);
@@ -747,7 +752,7 @@ function viewDone(which) {
   const next = nextDayAfter(n);
   const all = done === 9;
   return `<main class="page done-page" id="main">
-    <img class="done-img" src="img/nossa-senhora.svg" alt="" width="120" height="150">
+    <img class="done-img" src="${NS_IMG}" alt="" width="120" height="150">
     <p class="eyebrow">Dia ${n} de 9</p>
     <h1 tabindex="-1">${all ? 'Novena concluída' : 'Dia concluído'}</h1>
     ${ORNAMENT}
@@ -758,8 +763,8 @@ function viewDone(which) {
       ${dayDots(next)}
       ${next ? `<p class="hint">Próximo: <b>Dia ${next} — ${esc(DAYS[next - 1].title)}</b>. Quando for o seu momento de oração, é só voltar.</p>` : ''}
     </section>
-    <div class="actions"><a class="btn btn-primary btn-block btn-big" href="#/">VOLTAR AO INÍCIO</a>
-    <a class="btn btn-text" href="#/intencoes">Ver minhas intenções</a></div>
+    <div class="actions"><a class="btn btn-primary btn-block btn-big" href="#inicio">VOLTAR AO INÍCIO</a>
+    <a class="btn btn-text" href="#intencoes">Ver minhas intenções</a></div>
   </main>`;
 }
 
@@ -805,7 +810,7 @@ function viewIntentions() {
       </div></li>`;
   }).join('') : `<li class="empty">${intFilter === 'todos' ? 'Ainda não há intenções registradas. Quando quiser, escreva a primeira acima.' : 'Nada registrado nesta categoria ainda.'}</li>`;
 
-  return `${topBar('#/', 'Início', 'Minhas intenções')}
+  return `${topBar('#inicio', 'Início', 'Minhas intenções')}
   <main class="page" id="main">
     <h1 tabindex="-1">Minhas intenções</h1>
     <p class="subtitle">Um espaço privado. Tudo fica salvo apenas neste aparelho.</p>
@@ -827,12 +832,12 @@ function viewIntentions() {
       <ul class="int-mini">${personalDays.map(d => `<li><b>Dia ${d.n}:</b> ${esc(state.days[d.n].personal)}</li>`).join('')}</ul>
     </section>` : ''}
     <div class="actions">
-      <button class="btn btn-secondary btn-block" data-action="export-int">Exportar intenções (arquivo de texto)</button>
+      <button class="btn btn-secondary btn-block" data-action="export-int">${EMBED ? 'Exportar intenções (copiar texto)' : 'Exportar intenções (arquivo de texto)'}</button>
     </div>
   </main>`;
 }
 
-function exportIntentions() {
+function intentionsText() {
   const lines = [];
   lines.push('MINHAS INTENÇÕES — Novena de Nossa Senhora das Graças');
   lines.push('Exportado em ' + new Date().toLocaleString('pt-BR'));
@@ -850,8 +855,22 @@ function exportIntentions() {
     pd.forEach(d => lines.push(`  Dia ${d.n} (${d.title}): ${state.days[d.n].personal.replace(/\n/g, '\n    ')}`));
     lines.push('');
   }
-  const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/plain;charset=utf-8' });
-  const a = document.createElement('a');
+  return lines.join('\r\n');
+}
+
+function exportIntentions() {
+  const text = intentionsText();
+  if (EMBED) {
+    openModal(`
+      <div class="sheet-head"><h2 class="modal-title">Minhas intenções em texto</h2>
+      <button class="btn btn-text" data-action="close-modal">Fechar</button></div>
+      <p class="hint">Copie o texto e cole onde quiser guardar: bloco de notas, e-mail ou mensagem.</p>
+      <label class="sr-only" for="export-text">Texto das intenções</label>
+      <textarea id="export-text" class="export-text" readonly>${esc(text)}</textarea>
+      <button class="btn btn-primary btn-block" data-action="copy-export" autofocus>Copiar texto</button>`, { label: 'Exportar intenções' });
+    return;
+  }
+  const blob = new Blob(['\ufeff' + text], { type: 'text/plain;charset=utf-8' });  const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `minhas-intencoes-${new Date().toISOString().slice(0, 10)}.txt`;
   document.body.appendChild(a);
@@ -875,11 +894,11 @@ function viewPrayers() {
   }).join('');
   const days = DAYS.map(d => `<li><b>Dia ${d.n} — ${esc(d.title)}.</b> ${esc(d.intention)}</li>`).join('');
 
-  return `${topBar('#/', 'Início', 'Orações')}
+  return `${topBar('#inicio', 'Início', 'Orações')}
   <main class="page prayers-page" id="main">
     <h1 tabindex="-1">Orações da novena</h1>
-    <p class="subtitle">Todas as orações, completas, para consultar ou imprimir.</p>
-    <div class="actions no-print"><button class="btn btn-secondary btn-block" data-action="print">Imprimir as orações</button></div>
+    <p class="subtitle">Todas as orações, completas, para consultar${EMBED ? '' : ' ou imprimir'}.</p>
+    ${EMBED ? '' : '<div class="actions no-print"><button class="btn btn-secondary btn-block" data-action="print">Imprimir as orações</button></div>'}
     ${ORNAMENT}
     <section class="card order-card">
       <h2 class="card-title">Como rezar cada dia</h2>
@@ -902,18 +921,18 @@ function viewPrayers() {
 /* --- Ajustes --- */
 let installPrompt = null;
 function viewSettings() {
-  return `${topBar('#/', 'Início', 'Ajustes')}
+  return `${topBar('#inicio', 'Início', 'Ajustes')}
   <main class="page" id="main">
     <h1 tabindex="-1">Ajustes</h1>
     <section class="card settings-list">${settingsControls('page')}</section>
     <section class="card">
       <h2 class="card-title">Ferramentas</h2>
       <div class="stack">
-        <a class="btn btn-secondary btn-block" href="#/silencio">Momento de oração silenciosa</a>
-        <a class="btn btn-secondary btn-block" href="#/oracoes">Ver e imprimir as orações</a>
-        <a class="btn btn-secondary btn-block" href="#/intencoes">Exportar minhas intenções</a>
+        <a class="btn btn-secondary btn-block" href="#silencio">Momento de oração silenciosa</a>
+        <a class="btn btn-secondary btn-block" href="#oracoes">${EMBED ? 'Ver todas as orações' : 'Ver e imprimir as orações'}</a>
+        <a class="btn btn-secondary btn-block" href="#intencoes">Exportar minhas intenções</a>
         ${installPrompt ? '<button class="btn btn-secondary btn-block" data-action="install">Instalar como aplicativo</button>' : ''}
-        <a class="btn btn-secondary btn-block" href="#/ajuda">Como instalar no celular</a>
+        ${EMBED ? '' : '<a class="btn btn-secondary btn-block" href="#ajuda">Como instalar no celular</a>'}
       </div>
     </section>
     <section class="card">
@@ -926,7 +945,7 @@ function viewSettings() {
 }
 
 function viewSilence() {
-  return `${topBar('#/ajustes', 'Ajustes', 'Silêncio')}
+  return `${topBar('#ajustes', 'Ajustes', 'Silêncio')}
   <main class="page" id="main">
     <h1 tabindex="-1">Momento de silêncio</h1>
     <p class="subtitle">Escolha um tempo, respire com calma e fique na presença de Deus.</p>
@@ -936,7 +955,7 @@ function viewSilence() {
 }
 
 function viewHelp() {
-  return `${topBar('#/ajustes', 'Ajustes', 'Instalar')}
+  return `${topBar('#ajustes', 'Ajustes', 'Instalar')}
   <main class="page help" id="main">
     <h1 tabindex="-1">Como instalar no celular</h1>
     <section class="card">
@@ -963,18 +982,28 @@ function viewHelp() {
 }
 
 function viewNotFound() {
-  return `${topBar('#/', 'Início')}
+  return `${topBar('#inicio', 'Início')}
   <main class="page" id="main"><h1 tabindex="-1">Página não encontrada</h1>
-  <p>Vamos voltar ao início.</p><a class="btn btn-primary btn-block" href="#/">IR PARA O INÍCIO</a></main>`;
+  <p>Vamos voltar ao início.</p><a class="btn btn-primary btn-block" href="#inicio">IR PARA O INÍCIO</a></main>`;
 }
 
 /* ---------------------------------------------------------
    9. Roteamento
    --------------------------------------------------------- */
+/* Rotas simples no formato #nome ou #nome-argumento (ex.: #dia-3, #rezar-d3).
+   Também aceita o formato antigo #/nome/argumento. */
+function parseHash() {
+  const h = location.hash.replace(/^#\/?/, '');
+  const i = h.search(/[\/-]/);
+  const name = i < 0 ? h : h.slice(0, i);
+  const arg = i < 0 ? '' : h.slice(i + 1);
+  return [name === 'inicio' ? '' : name, arg];
+}
+
 let currentRoute = '';
 function render() {
-  const hash = location.hash.replace(/^#\/?/, '');
-  const [name, arg] = hash.split('/');
+  const [name, arg] = parseHash();
+  const hash = name + '/' + arg;
   const routeChanged = hash !== currentRoute;
   currentRoute = hash;
   let html;
@@ -1025,12 +1054,12 @@ function startSession(key, mode, day) {
   delete pendingSet[key];
   state.lastActive = key;
   save();
-  location.hash = `#/rezar/${key}`;
+  location.hash = `#rezar-${key}`;
 }
 
 function activeKey() {
-  const hash = location.hash.replace(/^#\/?/, '').split('/');
-  return hash[0] === 'rezar' ? hash[1] : null;
+  const [name, arg] = parseHash();
+  return name === 'rezar' ? arg : null;
 }
 
 function moveStep(dir) {
@@ -1057,10 +1086,10 @@ function finishSession(key) {
     state.days[session.day].done = true;
     state.days[session.day].doneAt = new Date().toISOString();
     save();
-    location.hash = `#/concluido/${session.day}`;
+    location.hash = `#concluido-${session.day}`;
   } else {
     save();
-    location.hash = '#/concluido/terco';
+    location.hash = '#concluido-terco';
   }
 }
 
@@ -1087,9 +1116,9 @@ function countAction(kind, n) {
 
 function goResume() {
   const key = state.lastActive;
-  if (key && state.sessions[key]) { location.hash = `#/rezar/${key}`; return; }
+  if (key && state.sessions[key]) { location.hash = `#rezar-${key}`; return; }
   const cur = currentDay();
-  location.hash = cur ? `#/dia/${cur}` : '#/dias';
+  location.hash = cur ? `#dia-${cur}` : '#dias';
 }
 
 async function toggleFullscreen() {
@@ -1123,7 +1152,7 @@ async function handleAction(btn) {
     case 'start-terco': startSession('terco', 'terco'); break;
     case 'open-session':
       state.lastActive = btn.dataset.key; save();
-      location.hash = `#/rezar/${btn.dataset.key}`; break;
+      location.hash = `#rezar-${btn.dataset.key}`; break;
     case 'restart-session': {
       const ok = await confirmDialog({
         title: 'Recomeçar do início?',
@@ -1143,7 +1172,7 @@ async function handleAction(btn) {
     case 'set-count': countAction('set', parseInt(btn.dataset.n, 10)); break;
     case 'pause':
       save();
-      location.hash = '#/';
+      location.hash = '#inicio';
       toast('Sua oração foi guardada. Continue quando quiser.');
       break;
     case 'open-display': openDisplaySheet(); break;
@@ -1172,7 +1201,7 @@ async function handleAction(btn) {
         Object.keys(state.sessions).forEach(k => { if (k.startsWith('d')) delete state.sessions[k]; });
         if (state.lastActive && state.lastActive.startsWith('d')) state.lastActive = null;
         save();
-        location.hash = '#/';
+        location.hash = '#inicio';
         render();
         toast('A novena foi reiniciada. Comece quando quiser.');
       }
@@ -1235,6 +1264,17 @@ async function handleAction(btn) {
       break;
     }
     case 'export-int': exportIntentions(); break;
+    case 'copy-export': {
+      const ta = $('#export-text');
+      try {
+        await navigator.clipboard.writeText(ta.value);
+        toast('Texto copiado.');
+      } catch (e) {
+        ta.focus(); ta.select();
+        toast('Texto selecionado. Use o comando de copiar do seu aparelho.');
+      }
+      break;
+    }
   }
 }
 
@@ -1262,7 +1302,8 @@ function init() {
   document.addEventListener('change', e => {
     const t = e.target;
     if (t.dataset.change === 'set-mystery') {
-      const key = location.hash.includes('terco') ? 'terco' : 'd' + location.hash.split('/')[2];
+      const [name, arg] = parseHash();
+      const key = name === 'terco' ? 'terco' : 'd' + arg;
       pendingSet[key] = t.value;
       render();
       const sel = $('#mset');
@@ -1291,12 +1332,12 @@ function init() {
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     installPrompt = e;
-    if (location.hash.startsWith('#/ajustes')) render();
+    if (location.hash.startsWith('#ajustes')) render();
   });
 
   render();
 
-  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+  if (!EMBED && 'serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(() => {});
     });
