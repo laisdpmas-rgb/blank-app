@@ -30,6 +30,7 @@ function defaultState() {
       clean: false,
       jaculatoria: true,
       rosary: 'ave', // novena: 'ave' (terço tradicional), 'jaculatoria' (terço da Medalha) ou 'nenhum'
+      tercoRosary: 'ave', // terço avulso: 'ave' ou 'jaculatoria'
       wakeLock: true
     }
   };
@@ -145,6 +146,10 @@ const ROSARY_OPTIONS = [
   ['nenhum', 'Só a novena', 'Sem o terço.'],
   ['ave', 'Novena com terço', 'Terço tradicional, com as Ave-Marias.'],
   ['jaculatoria', 'Novena com terço da Medalha', 'Em cada conta, a jaculatória “Ó Maria concebida sem pecado” no lugar da Ave-Maria.']
+];
+const TERCO_OPTIONS = [
+  ['ave', 'Terço tradicional', 'Com as Ave-Marias.'],
+  ['jaculatoria', 'Terço da Medalha', ROSARY_OPTIONS[2][2]]
 ];
 
 function buildSteps(session) {
@@ -631,12 +636,12 @@ function viewDay(n) {
   </main>`;
 }
 
-function rosaryChoice() {
-  const cur = state.settings.rosary;
+function rosaryChoice(key = 'rosary', options = ROSARY_OPTIONS, label = 'Como rezar hoje') {
+  const cur = state.settings[key];
   return `<div class="setting rosary-choice">
-    <span class="setting-label" id="lbl-rosary">Como rezar hoje</span>
+    <span class="setting-label" id="lbl-rosary">${label}</span>
     <div class="choice-list" role="radiogroup" aria-labelledby="lbl-rosary">
-      ${ROSARY_OPTIONS.map(([v, l, h]) => `<button role="radio" aria-checked="${cur === v}" class="choice ${cur === v ? 'on' : ''}" data-action="rosary" data-value="${v}">
+      ${options.map(([v, l, h]) => `<button role="radio" aria-checked="${cur === v}" class="choice ${cur === v ? 'on' : ''}" data-action="rosary" data-key="${key}" data-value="${v}">
         <b>${l}</b><span>${h}</span></button>`).join('')}
     </div>
   </div>`;
@@ -664,9 +669,11 @@ function viewTerco() {
   return `${topBar('#inicio', 'Início', 'Terço Mariano')}
   <main class="page" id="main">
     <h1 tabindex="-1">Terço Mariano</h1>
-    <p class="subtitle">Cinco mistérios, um de cada vez. O aplicativo conta as Ave-Marias por você.</p>
+    <p class="subtitle">Cinco mistérios, um de cada vez. O aplicativo conta as contas por você.</p>
     ${ORNAMENT}
-    ${session ? `<p class="hint">Mistérios deste terço: <b>${MYSTERIES[session.set].name}</b>.</p>` : mysterySelector(selected, auto)}
+    ${session
+      ? `<p class="hint">Terço em andamento: <b>${session.rosary === 'jaculatoria' ? 'Terço da Medalha' : 'Terço tradicional'}</b> · ${MYSTERIES[session.set].name}.</p>`
+      : rosaryChoice('tercoRosary', TERCO_OPTIONS, 'Como rezar') + mysterySelector(selected, auto)}
     <section class="card">
       <h2 class="card-title">${esc(set.name)}</h2>
       <p class="hint">${esc(set.days)}</p>
@@ -1122,7 +1129,7 @@ function startSession(key, mode, day) {
   const set = pendingSet[key] || todaysMysterySet();
   state.sessions[key] = {
     mode, day: day || null, set, step: 0, counts: {},
-    rosary: mode === 'novena' ? state.settings.rosary : 'ave',
+    rosary: mode === 'novena' ? state.settings.rosary : state.settings.tercoRosary,
     startedAt: new Date().toISOString(), updatedAt: new Date().toISOString()
   };
   delete pendingSet[key];
@@ -1239,7 +1246,7 @@ async function handleAction(btn) {
       }
       break;
     }
-    case 'rosary': state.settings.rosary = btn.dataset.value; save(); render(); break;
+    case 'rosary': state.settings[btn.dataset.key] = btn.dataset.value; save(); render(); break;
     case 'next': moveStep(1); break;
     case 'prev': moveStep(-1); break;
     case 'count': countAction('count'); break;

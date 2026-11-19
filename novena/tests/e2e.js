@@ -201,6 +201,15 @@ const EXPECTED_OPENING = [
   await p2.locator('[data-action="pause"]').click();
   await p2.goto(BASE + '#dia-4');
   check((await p2.locator('[data-action="rosary"]').count()) === 0 && (await p2.locator('main').innerText()).includes('Só a novena'), 'dia em andamento mostra a forma escolhida');
+  await p2.goto(BASE + '#terco');
+  await p2.locator('[data-action="rosary"][data-value="jaculatoria"]').click();
+  await p2.locator('[data-action="start-terco"]').click();
+  await p2.waitForSelector('.flow');
+  check((await p2.evaluate(() => buildSteps(state.sessions.terco).filter(x => x.total === 10).every(x => x.p === 'jacmaria'))), 'terço avulso da Medalha: jaculatória nas dezenas');
+  await p2.locator('[data-action="pause"]').click();
+  await p2.goto(BASE + '#terco');
+  check((await p2.locator('main').innerText()).includes('Terço da Medalha'), 'terço avulso em andamento mostra a forma escolhida');
+  await p2.evaluate(() => { state.settings.tercoRosary = 'ave'; delete state.sessions.terco; save(); });
   await p2.evaluate(() => { state.settings.rosary = 'ave'; delete state.sessions.d3; delete state.sessions.d4; save(); });
 
   console.log('11. Diário de intenções');
