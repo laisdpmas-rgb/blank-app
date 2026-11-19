@@ -193,10 +193,11 @@ select { min-height: 48px; appearance: auto; }
 
 /* ---------- Início ---------- */
 .home { text-align: center; padding-top: calc(1rem + env(safe-area-inset-top)); }
-.hero { margin: 0 auto .5rem; width: min(52vw, 200px); }
-.hero img { display: block; width: 100%; height: auto; }
+.hero { margin: 0 auto .75rem; width: min(62vw, 240px); }
+.hero img { display: block; width: 100%; height: auto; border-radius: 14px; box-shadow: var(--shadow); }
 .home-title { font-size: 1.7rem; margin-top: .25rem; }
-.home .subtitle { margin-bottom: 0; }
+.home .subtitle { margin-bottom: .4rem; }
+.about-link { font-size: .9rem; }
 .progress-card {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
   padding: 1rem; margin: 0 0 1rem; box-shadow: var(--shadow); text-align: center;
@@ -382,7 +383,7 @@ body.in-flow { background: var(--bg); }
 
 /* ---------- Conclusão ---------- */
 .done-page { text-align: center; padding-top: calc(2rem + env(safe-area-inset-top)); }
-.done-img { width: 110px; height: auto; display: block; margin: 0 auto .5rem; }
+.done-img { width: 110px; height: auto; border-radius: 10px; display: block; margin: 0 auto .5rem; }
 .done-message { font-family: var(--serif); font-size: 1.25rem; line-height: 1.6; color: var(--ink-soft); }
 
 /* ---------- Orações ---------- */

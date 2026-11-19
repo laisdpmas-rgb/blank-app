@@ -28,12 +28,16 @@ Feito em HTML, CSS e JavaScript puros. Funciona sem internet depois da primeira 
 7. Glória ao Pai
 8. Cinco dezenas: mistério → Pai-Nosso → 10 Ave-Marias → Glória ao Pai → Jaculatória de Fátima
 9. Salve-Rainha
-10. Intenção do dia (com cronômetro de silêncio opcional)
-11. Oração a Nossa Senhora das Graças
-12. Oração final da novena: *Lembrai-vos*
-13. Sinal da Cruz
+10. Ato de contrição
+11. Meditação do dia (meditação tradicional da novena da Medalha Milagrosa)
+12. Súplica a Nossa Senhora (com momento de silêncio para pedir a graça)
+13. Intenção do dia (com cronômetro de silêncio opcional)
+14. Três Ave-Marias
+15. Jaculatória da Medalha: “Ó Maria concebida sem pecado, rogai por nós que recorremos a vós”
+16. Oração final
+17. Sinal da Cruz
 
-As orações estão nas versões tradicionais em português do Brasil. As reflexões dos dias e dos mistérios são textos simples de meditação, escritos para este aplicativo e não atribuídos a nenhum santo ou documento oficial. Há várias versões da Novena de Nossa Senhora das Graças. Esta usa a oração tradicional ligada à Medalha Milagrosa e o *Lembrai-vos* como oração final.
+As orações estão nas versões tradicionais em português do Brasil. Cada dia tem um tema, uma reflexão curta baseada na história da Medalha Milagrosa, uma intenção e a meditação tradicional da novena. As reflexões e intenções foram escritas para este aplicativo e não são atribuídas a nenhum santo ou documento oficial. A página “Sobre” conta a história das aparições a Santa Catarina Labouré em 1830. Por tradição, a novena é rezada de 18 a 26 de novembro, antes da festa de 27 de novembro, mas pode ser rezada em qualquer época.
 
 ---
 
@@ -47,7 +51,7 @@ novena/
 ├── css/style.css         visual, temas e impressão
 ├── js/data.js            orações, nove dias e mistérios
 ├── js/app.js             telas, modo guiado, contador, intenções e salvamento
-├── img/nossa-senhora.svg ilustração de Nossa Senhora das Graças
+├── img/nossa-senhora.jpg ilustração de Nossa Senhora das Graças
 ├── icons/                ícones do aplicativo (inclusive para iPhone)
 └── tests/e2e.js          testes automáticos (opcional, para desenvolvedores)
 ```

@@ -75,21 +75,31 @@ const PRAYERS = {
       'R. Para que sejamos dignos das promessas de Cristo. Amém.'
     ]
   },
-  nsgracas: {
-    title: 'Oração a Nossa Senhora das Graças',
+  contricao: {
+    title: 'Ato de contrição',
     text: [
-      'Ó Imaculada Virgem, Mãe de Deus e nossa Mãe, ao contemplar-vos de braços abertos derramando graças sobre os que vo-las pedem, cheios de confiança na vossa poderosa intercessão, inúmeras vezes manifestada pela Medalha Milagrosa, embora reconhecendo a nossa indignidade por causa de nossas inúmeras culpas, ousamos nos aproximar de vossos pés para vos expor, durante esta oração, as nossas mais prementes necessidades.',
-      '(Faça um momento de silêncio e apresente a graça que deseja alcançar.)',
-      'Concedei, pois, ó Virgem da Medalha Milagrosa, este favor que confiantes vos solicitamos, para maior glória de Deus, engrandecimento do vosso nome e o bem de nossas almas. E, para melhor servirmos ao vosso Divino Filho, inspirai-nos profundo ódio ao pecado e dai-nos coragem de nos afirmar sempre verdadeiros cristãos. Amém.',
-      'Ó Maria concebida sem pecado, rogai por nós que recorremos a vós. (três vezes)'
+      'Senhor meu, Jesus Cristo, Deus e Homem verdadeiro, Criador e Redentor meu, por serdes Vós quem sois, sumamente bom e digno de ser amado sobre todas as coisas, e porque Vos amo e estimo, pesa-me, Senhor, por Vos ter ofendido; e pesa-me também por ter perdido o Céu e merecido o inferno.',
+      'Proponho, firmemente, com o auxílio de Vossa divina graça e pela poderosa intercessão de Vossa Mãe Santíssima, emendar-me e nunca mais Vos tornar a ofender. Espero alcançar o perdão de minhas culpas, por Vossa infinita misericórdia. Assim seja.'
     ]
   },
-  lembraivos: {
-    title: 'Oração final da novena — Lembrai-vos',
+  suplica: {
+    title: 'Súplica a Nossa Senhora',
     text: [
-      'Lembrai-vos, ó piíssima Virgem Maria, que nunca se ouviu dizer que algum daqueles que têm recorrido à vossa proteção, implorado a vossa assistência e reclamado o vosso socorro, fosse por vós desamparado.',
-      'Animado eu, pois, com igual confiança, a vós, ó Virgem entre todas singular, como a Mãe recorro, de vós me valho e, gemendo sob o peso dos meus pecados, me prostro a vossos pés.',
-      'Não desprezeis as minhas súplicas, ó Mãe do Verbo de Deus humanado, mas dignai-vos de as ouvir propícias e de me alcançar o que vos rogo. Amém.'
+      'Ó Imaculada Virgem Mãe de Deus e nossa Mãe, ao contemplar-vos de braços abertos derramando graças sobre os que vos pedem, cheios de confiança na vossa poderosa intercessão, inúmeras vezes manifestada pela Medalha Milagrosa, embora reconhecendo a nossa indignidade por causa de nossas inúmeras culpas, acercamo-nos de vossos pés para vos expor, durante essa oração, as nossas mais prementes necessidades.',
+      '(Momento de silêncio e de pedir a graça desejada.)',
+      'Concedei, pois, ó Virgem da Medalha Milagrosa, este favor que confiantes vos solicitamos, para maior glória de Deus, engrandecimento do vosso nome, e o bem de nossas almas. E para melhor servirmos ao Vosso Divino Filho, inspirai-nos profundo ódio ao pecado e dai-nos coragem de nos afirmar sempre verdadeiros cristãos. Amém.'
+    ]
+  },
+  jacmaria: {
+    title: 'Jaculatória da Medalha Milagrosa',
+    text: [
+      'Ó Maria concebida sem pecado, rogai por nós que recorremos a vós!'
+    ]
+  },
+  final: {
+    title: 'Oração final',
+    text: [
+      'Santíssima Virgem, eu reconheço e confesso vossa Santa e Imaculada Conceição, pura e sem mancha. Ó puríssima Virgem Maria, por vossa Conceição Imaculada e gloriosa prerrogativa de Mãe de Deus, alcançai-me de vosso amado Filho a humildade, caridade, obediência, castidade, santa pureza de coração, de corpo e espírito; alcançai-me a perseverança na prática do bem, uma santa vida, uma boa morte e a graça de (pede-se uma graça) que peço com toda a confiança. Amém.'
     ]
   }
 };
@@ -97,7 +107,7 @@ const PRAYERS = {
 /* Ordem em que as orações aparecem na página "Todas as orações" */
 const PRAYER_ORDER = [
   'sinal', 'espirito', 'oferecimento', 'credo', 'painosso', 'avemaria',
-  'gloria', 'jaculatoria', 'salve', 'nsgracas', 'lembraivos'
+  'gloria', 'jaculatoria', 'salve', 'contricao', 'suplica', 'jacmaria', 'final'
 ];
 
 const DAYS = [
@@ -105,66 +115,104 @@ const DAYS = [
     n: 1,
     title: 'Entrega e confiança',
     verse: { text: 'Eis aqui a serva do Senhor. Faça-se em mim segundo a tua palavra.', ref: 'Lc 1,38' },
-    reflection: 'Maria não sabia tudo o que viria pela frente, mas confiou. Hoje você também não precisa ter todas as respostas. Basta começar, do jeito que está, e entregar a Deus aquilo que pesa no seu coração.',
-    intention: 'Peço a graça de confiar mais em Deus e de entregar em suas mãos tudo o que não consigo controlar.'
+    reflection: 'Na noite de 18 para 19 de julho de 1830, em Paris, a jovem noviça Catarina Labouré foi despertada e conduzida até a capela do convento. Ali encontrou Nossa Senhora. Catarina não entendia tudo o que acontecia, mas foi. Hoje, faça como ela: venha do jeito que está e confie.',
+    intention: 'Peço a graça de confiar mais em Deus e de entregar em suas mãos tudo o que não consigo controlar.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'Primeira aparição',
+    meditation: 'Contemplemos a Virgem Imaculada em sua primeira aparição a Santa Catarina Labouré. A piedosa noviça, guiada por seu Anjo da Guarda, é apresentada a Imaculada Senhora. Consideremos sua inefável alegria. Seremos também felizes como Santa Catarina se trabalharmos com ardor na nossa santificação. Gozaremos as delícias do Paraíso se nos privarmos dos gozos terrenos.'
   },
   {
     n: 2,
     title: 'Paz interior',
     verse: { text: 'Deixo-vos a paz, a minha paz vos dou.', ref: 'Jo 14,27' },
-    reflection: 'A paz que Jesus oferece não depende de tudo estar resolvido. Ela nasce quando paramos um pouco e lembramos que não estamos sozinhos. Respire com calma e deixe Maria acalmar o seu coração.',
-    intention: 'Peço a paz interior, a serenidade nos pensamentos e o descanso para o meu coração.'
+    reflection: 'Naquela primeira aparição, Catarina ficou ajoelhada junto de Nossa Senhora, com as mãos apoiadas em seu colo, como uma filha perto da mãe. Maria falou de tempos difíceis, mas convidou a buscar consolo aos pés do altar. A paz não depende de tudo estar calmo lá fora. Descanse um pouco perto dela.',
+    intention: 'Peço a paz interior, a serenidade nos pensamentos e o descanso para o meu coração.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'Lágrimas de Maria',
+    meditation: 'Contemplemos Maria chorando sobre as calamidades que viriam sobre o mundo, pensando que o coração de seu Filho seria ultrajado na cruz, escarnecido, e seus filhos prediletos perseguidos. Confiemos na Virgem compassiva e também participemos do fruto de suas lágrimas.'
   },
   {
     n: 3,
     title: 'Família e amor',
-    verse: { text: 'Sua mãe guardava todas estas coisas no coração.', ref: 'Lc 2,51' },
-    reflection: 'Maria cuidou da Sagrada Família com amor simples e paciente. Toda família tem alegrias e feridas. Hoje, coloque cada pessoa da sua casa e da sua história sob o manto de Nossa Senhora.',
-    intention: 'Peço pela minha família: que haja amor, diálogo, cuidado e união entre nós.'
+    verse: { text: 'Mulher, eis aí o teu filho.', ref: 'Jo 19,26' },
+    reflection: 'No verso da Medalha Milagrosa estão dois corações lado a lado: o de Jesus, coroado de espinhos, e o de Maria, atravessado por uma espada. É o amor que sofre junto e não abandona. Coloque hoje cada pessoa da sua família dentro desses dois corações.',
+    intention: 'Peço pela minha família: que haja amor, diálogo, cuidado e união entre nós.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'Proteção de Maria',
+    meditation: 'Contemplemos Nossa Imaculada Mãe, dizendo, em suas aparições, a Santa Catarina: “Eu mesma estarei convosco: não vos perco de vista e vos concederei abundantes graças”. Sede para mim, Virgem Imaculada, o escudo e a defesa em todas as necessidades.'
   },
   {
     n: 4,
     title: 'Saúde e proteção',
-    verse: { text: 'Vinde a mim, todos vós que estais cansados e sobrecarregados, e eu vos darei descanso.', ref: 'Mt 11,28' },
-    reflection: 'Nosso corpo e nossa mente também precisam de cuidado. Nossa Senhora das Graças é Mãe atenta a quem sofre. Apresente a ela as suas dores e as de quem você ama, com simplicidade.',
-    intention: 'Peço saúde do corpo, da mente e da alma, e a proteção de Deus para mim e para quem eu amo.'
+    verse: { text: 'Porei inimizade entre ti e a mulher, entre a tua descendência e a descendência dela.', ref: 'Gn 3,15' },
+    reflection: 'Na medalha, Nossa Senhora está de pé sobre o globo e pisa a serpente: o mal não tem a última palavra. As primeiras medalhas foram distribuídas em 1832, durante uma epidemia de cólera em Paris, e muitas pessoas recorreram a ela com fé. Entregue a Maria as suas dores e as de quem você ama.',
+    intention: 'Peço saúde do corpo, da mente e da alma, e a proteção de Deus para mim e para quem eu amo.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'Segunda aparição',
+    meditation: 'Estando Santa Catarina Labouré em oração, a 27 de novembro de 1830, apareceu-lhe a Virgem Maria, formosíssima, esmagando a cabeça da serpente infernal. Nessa aparição, vemos seu desejo imenso de nos proteger sempre contra o inimigo de nossa salvação. Invoquemos a Imaculada Mãe com confiança e amor.'
   },
   {
     n: 5,
     title: 'Perdão e liberdade',
     verse: { text: 'Pai, perdoa-lhes, porque não sabem o que fazem.', ref: 'Lc 23,34' },
-    reflection: 'Perdoar não é esquecer nem fingir que não doeu. É deixar que Deus cuide da ferida, para que ela não nos prenda mais. Peça a graça de perdoar e também de se perdoar.',
-    intention: 'Peço a graça do perdão: perdoar quem me feriu, pedir perdão a quem feri e me libertar do que me prende.'
+    reflection: 'Em torno da imagem da medalha está escrito: “Ó Maria concebida sem pecado, rogai por nós que recorremos a vós”. Maria, sem pecado, não se afasta de nós, pecadores: ela intercede. Muitas conversões foram atribuídas a essa medalha. Peça hoje a graça de perdoar, de pedir perdão e de se perdoar.',
+    intention: 'Peço a graça do perdão: perdoar quem me feriu, pedir perdão a quem feri e me libertar do que me prende.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'As mãos de Maria',
+    meditation: 'Contemplemos, hoje, Maria desprendendo de suas mãos raios luminosos. “Estes raios, disse Ela, são a figura das graças que derramo sobre todos aqueles que mas pedem e aos que trazem com fé a minha medalha”. Não desperdicemos tantas graças! Peçamos, com fervor, humildade e perseverança, pois Maria Imaculada nos alcançará.'
   },
   {
     n: 6,
     title: 'Caminhos e decisões',
     verse: { text: 'Fazei tudo o que ele vos disser.', ref: 'Jo 2,5' },
-    reflection: 'Em Caná, Maria percebeu a necessidade e apontou para Jesus. Quando não sabemos que caminho seguir, ela nos ensina a ouvir o Filho. Um passo de cada vez já é suficiente.',
-    intention: 'Peço luz para as minhas decisões e discernimento para escolher o caminho que agrada a Deus.'
+    reflection: 'No verso da medalha há a letra M unida a uma cruz. Maria está sempre ligada a Jesus e sempre aponta para Ele. Quando o caminho não estiver claro, olhe para onde ela aponta. Um passo de cada vez já é suficiente.',
+    intention: 'Peço luz para as minhas decisões e discernimento para escolher o caminho que agrada a Deus.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'Terceira aparição',
+    meditation: 'Contemplemos Maria aparecendo a Santa Catarina, radiante de luz, cheia de bondade, rodeada de estrelas, mandando cunhar uma medalha e prometendo muitas graças a todos que a trouxerem com devoção e amor. Guardemos fervorosamente a Santa Medalha, pois, como um escudo, ela nos protegerá dos perigos.'
   },
   {
     n: 7,
     title: 'Força e perseverança',
     verse: { text: 'Tudo posso naquele que me fortalece.', ref: 'Fl 4,13' },
-    reflection: 'Maria permaneceu de pé junto à cruz. Perseverar não é nunca cair, é recomeçar sempre que for preciso. Se hoje está difícil, você chegou até aqui, e isso já é uma forma de fidelidade.',
-    intention: 'Peço força para enfrentar as dificuldades e perseverança para não desistir do bem.'
+    reflection: 'Depois das aparições, Santa Catarina passou cerca de 46 anos em silêncio, servindo os idosos de um asilo e fazendo tarefas simples. Quase ninguém sabia que era ela a vidente da medalha. Perseverar é ser fiel nas pequenas coisas de cada dia. Se hoje está difícil, você chegou até aqui.',
+    intention: 'Peço força para enfrentar as dificuldades e perseverança para não desistir do bem.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'Súplica',
+    meditation: 'Ó Virgem Milagrosa, Rainha Excelsa Imaculada Senhora, sede minha advogada, meu refúgio e asilo nesta terra, meu consolo nas tristezas e aflições, minha fortaleza e advogada na hora da morte.'
   },
   {
     n: 8,
     title: 'Gratidão',
     verse: { text: 'A minha alma engrandece o Senhor, e o meu espírito exulta em Deus, meu Salvador.', ref: 'Lc 1,46-47' },
-    reflection: 'Maria cantou as maravilhas de Deus em sua vida. Hoje, olhe com calma para o que você recebeu: pessoas, momentos, pequenas graças do dia a dia. A gratidão abre espaço para a alegria.',
-    intention: 'Agradeço a Deus por todas as graças recebidas, as que percebi e as que ainda não percebi.'
+    reflection: 'Catarina viu raios de luz saindo das mãos de Nossa Senhora: eram as graças derramadas sobre quem as pede. Algumas pedras dos anéis não brilhavam. Segundo o seu relato, eram as graças que as pessoas se esquecem de pedir. Agradeça hoje pelas graças recebidas, e não tenha medo de pedir.',
+    intention: 'Agradeço a Deus por todas as graças recebidas, as que percebi e as que ainda não percebi.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'Súplica',
+    meditation: 'Ó Virgem Imaculada da Medalha Milagrosa, fazei com que esses raios luminosos que irradiam de vossas mãos virginais iluminem minha inteligência para melhor conhecer o bem e abrasem meu coração, vivos sentimentos de fé, esperança e caridade.'
   },
   {
     n: 9,
     title: 'Entrega e ação de graças',
-    verse: { text: 'Dai graças ao Senhor, porque ele é bom; porque eterna é a sua misericórdia.', ref: 'Sl 136(135),1' },
-    reflection: 'Chegamos ao último dia. Tudo o que foi rezado nestes dias está nas mãos de Deus, por meio de Maria. Entregue mais uma vez as suas intenções e agradeça pelo caminho percorrido.',
-    intention: 'Entrego a Deus, pelas mãos de Nossa Senhora das Graças, todas as intenções desta novena, e agradeço por cada dia de oração.'
+    verse: { text: 'Apareceu no céu um grande sinal: uma mulher vestida de sol, tendo a lua debaixo dos pés e sobre a cabeça uma coroa de doze estrelas.', ref: 'Ap 12,1' },
+    reflection: 'Na aparição de 27 de novembro de 1830, Nossa Senhora segurava um pequeno globo dourado e o oferecia a Deus: o mundo inteiro e cada pessoa. Hoje, entregue pelas mãos dela tudo o que foi rezado nestes nove dias, e agradeça pelo caminho percorrido.',
+    intention: 'Entrego a Deus, pelas mãos de Nossa Senhora das Graças, todas as intenções desta novena, e agradeço por cada dia de oração.',
+    /* Meditação tradicional da novena da Medalha Milagrosa */
+    meditationTitle: 'Súplica',
+    meditation: 'Ó Mãe Imaculada, fazei com que a cruz de vossa Medalha brilhe sempre diante de meus olhos, suavize as penas da vida presente e conduza-me à vida eterna.'
   }
 ];
+
+/* História da devoção, para a página "Sobre Nossa Senhora das Graças" */
+const ABOUT = [
+  { h: 'As aparições de 1830', p: 'Em 1830, em Paris, na capela das Filhas da Caridade de São Vicente de Paulo, na Rue du Bac, Nossa Senhora apareceu à noviça Catarina Labouré. A primeira aparição foi na noite de 18 para 19 de julho. Na de 27 de novembro, Maria mostrou a ela a imagem da medalha.' },
+  { h: 'A imagem da medalha', p: 'Nossa Senhora aparece de pé sobre o globo, pisando a serpente, com as mãos abertas das quais saem raios de luz, sinal das graças que ela derrama sobre quem as pede. Ao redor, a frase: “Ó Maria concebida sem pecado, rogai por nós que recorremos a vós”.' },
+  { h: 'O verso da medalha', p: 'A letra M unida a uma cruz, os Sagrados Corações de Jesus e de Maria e doze estrelas ao redor.' },
+  { h: 'Por que “Milagrosa”', p: 'As primeiras medalhas foram cunhadas em 1832. Por causa das muitas graças, curas e conversões atribuídas a ela, o povo passou a chamá-la de Medalha Milagrosa.' },
+  { h: 'Santa Catarina Labouré', p: 'Catarina guardou silêncio sobre as aparições durante quase toda a vida e serviu os idosos com simplicidade. Morreu em 31 de dezembro de 1876 e foi canonizada em 1947.' },
+  { h: 'A festa', p: 'A memória de Nossa Senhora da Medalha Milagrosa, ou Nossa Senhora das Graças, é celebrada em 27 de novembro. Por tradição, muitas pessoas rezam a novena de 18 a 26 de novembro, mas ela pode ser rezada em qualquer época do ano.' }
+];
+
 
 /* Mistérios do Rosário */
 const MYSTERIES = {
@@ -227,3 +275,4 @@ const WEEKDAY_NAMES = ['domingo', 'segunda-feira', 'terça-feira', 'quarta-feira
 const ORDINALS = ['1º', '2º', '3º', '4º', '5º'];
 
 const COMPLETION_MESSAGE = 'Você concluiu mais um dia da sua novena. Que este momento de oração fortaleça sua fé.';
+

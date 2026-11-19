@@ -36,6 +36,11 @@ const EXPECTED_OPENING = [
   check((await page.locator('.progress-count').innerText()).includes('0 de 9'), 'indicador 0 de 9');
   check(await page.getByText('COMEÇAR MINHA NOVENA').isVisible(), 'botão COMEÇAR MINHA NOVENA');
   check(await page.locator('.hero img').isVisible(), 'imagem de Nossa Senhora visível');
+  await page.click('.about-link');
+  await page.waitForFunction(() => location.hash === '#sobre' && document.querySelectorAll('.card').length === 6);
+  check((await h1()) === 'Nossa Senhora das Graças' && (await page.locator('.card').count()) === 6, 'página sobre a Medalha Milagrosa');
+  await page.goto(BASE);
+  await page.waitForSelector('.home');
   await shot('01-home');
 
   console.log('2. Navegação entre os nove dias');
@@ -146,15 +151,13 @@ const EXPECTED_OPENING = [
     if (!(await p2.locator('.flow').count())) break;
     const t = await p2.locator('h1').first().innerText();
     rest.push(t);
-    if (await p2.locator('[data-action="count"]').count()) {
-      for (let k = 0; k < 10; k++) await p2.locator('[data-action="count"]').click();
-    }
+    while (await p2.locator('[data-action="count"]').count()) await p2.locator('[data-action="count"]').click();
     const label = await p2.locator('.flow-nav .btn-primary').innerText();
     await p2.locator('.flow-nav .btn-primary').click();
     if (label.includes('CONCLUIR')) break;
   }
-  const expectedTail = ['Salve-Rainha', 'Intenção do dia', 'Oração a Nossa Senhora das Graças', 'Oração final da novena — Lembrai-vos', 'Sinal da Cruz'];
-  check(JSON.stringify(rest.slice(-5)) === JSON.stringify(expectedTail), 'encerramento: ' + rest.slice(-5).join(' → '));
+  const expectedTail = ['Salve-Rainha', 'Ato de contrição', 'Meditação do dia · Primeira aparição', 'Súplica a Nossa Senhora', 'Intenção do dia', 'Três Ave-Marias', 'Jaculatória da Medalha Milagrosa', 'Oração final', 'Sinal da Cruz'];
+  check(JSON.stringify(rest.slice(-9)) === JSON.stringify(expectedTail), 'encerramento: ' + rest.slice(-9).join(' → '));
   check(rest.filter(t => t === 'Dez Ave-Marias').length === 5, 'cinco dezenas no total');
   check(rest.filter(t => t === 'Jaculatória de Fátima').length === 5, 'jaculatória após cada dezena');
   await p2.waitForSelector('.done-page');
@@ -216,7 +219,7 @@ const EXPECTED_OPENING = [
   await p2.locator('[data-action="theme"][data-value="light"]').click();
   await p2.goto(BASE + '#/oracoes');
   const allText = await p2.locator('main').innerText();
-  check(['Salve, Rainha', 'Creio em Deus Pai', 'Lembrai-vos', 'Ó meu Jesus', 'Ó Imaculada Virgem', 'Vinde, Espírito Santo', 'Divino Jesus'].every(s => allText.includes(s)), 'página de orações completa');
+  check(['Salve, Rainha', 'Creio em Deus Pai', 'Senhor meu, Jesus Cristo', 'Santíssima Virgem, eu reconheço', 'Ó meu Jesus', 'Ó Imaculada Virgem', 'Vinde, Espírito Santo', 'Divino Jesus'].every(s => allText.includes(s)), 'página de orações completa');
 
   console.log('13. Reiniciar a novena (com confirmação)');
   await p2.goto(BASE + '#/ajustes');
@@ -241,13 +244,13 @@ const EXPECTED_OPENING = [
   check((await p2.locator('h1').first().innerText()).includes('Nossa Senhora das Graças'), 'abre sem internet');
   await p2.goto(BASE + '#/oracoes');
   check(await p2.getByText('Salve, Rainha').first().isVisible(), 'orações disponíveis offline');
-  const imgOk = await p2.evaluate(() => { const i = document.createElement('img'); i.src = 'img/nossa-senhora.svg'; return new Promise(r => { i.onload = () => r(true); i.onerror = () => r(false); }); });
+  const imgOk = await p2.evaluate(() => { const i = document.createElement('img'); i.src = 'img/nossa-senhora.jpg'; return new Promise(r => { i.onload = () => r(true); i.onerror = () => r(false); }); });
   check(imgOk, 'imagem disponível offline');
   await context2.setOffline(false);
 
   console.log('15. Telas pequenas (320 px)');
   await p2.setViewportSize({ width: 320, height: 568 });
-  for (const r of ['', 'dias', 'dia/4', 'terco', 'intencoes', 'oracoes', 'ajustes', 'silencio', 'ajuda']) {
+  for (const r of ['', 'dias', 'dia/4', 'terco', 'intencoes', 'oracoes', 'ajustes', 'silencio', 'ajuda', 'sobre']) {
     await p2.goto(BASE + '#/' + r);
     await p2.waitForTimeout(80);
     const over = await p2.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

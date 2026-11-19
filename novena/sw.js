@@ -1,6 +1,6 @@
 /* Service Worker — guarda o aplicativo para funcionar sem internet.
    Ao alterar qualquer arquivo, aumente a versão abaixo. */
-const CACHE = 'novena-ns-gracas-v2';
+const CACHE = 'novena-ns-gracas-v3';
 const ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const ASSETS = [
   './js/data.js',
   './js/app.js',
   './manifest.json',
-  './img/nossa-senhora.svg',
+  './img/nossa-senhora.jpg',
   './icons/icon.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',

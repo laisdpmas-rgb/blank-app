@@ -11,7 +11,7 @@
 const STORAGE_KEY = 'novena-ns-gracas:v1';
 /* Versão publicada como artefato do Claude: sem impressão, downloads ou instalação */
 const EMBED = !!window.NOVENA_EMBED;
-const NS_IMG = window.NOVENA_IMG || 'img/nossa-senhora.svg';
+const NS_IMG = window.NOVENA_IMG || 'img/nossa-senhora.jpg';
 const FONT_LEVELS = [1, 1.125, 1.25, 1.4, 1.6];
 
 function defaultState() {
@@ -169,9 +169,21 @@ function buildSteps(session) {
   steps.push({ id: 'salve', kind: 'prayer', p: 'salve', section: 'Encerramento do Terço', seg: 6 });
   if (session.mode === 'novena') {
     const sn = `Novena · Dia ${session.day}`;
+    steps.push({ id: 'contricao', kind: 'prayer', p: 'contricao', section: sn, seg: 6 });
+    steps.push({
+      id: 'meditacao', kind: 'prayer', section: sn, seg: 6,
+      title: `Meditação do dia · ${DAYS[session.day - 1].meditationTitle}`,
+      custom: [DAYS[session.day - 1].meditation]
+    });
+    steps.push({ id: 'suplica', kind: 'prayer', p: 'suplica', section: sn, seg: 6 });
     steps.push({ id: 'intencao', kind: 'intention', section: sn, seg: 6, title: 'Intenção do dia' });
-    steps.push({ id: 'nsgracas', kind: 'prayer', p: 'nsgracas', section: sn, seg: 6 });
-    steps.push({ id: 'lembraivos', kind: 'prayer', p: 'lembraivos', section: sn, seg: 6 });
+    steps.push({
+      id: 'ave-nov', kind: 'count', p: 'avemaria', total: 3, section: sn, seg: 6,
+      title: 'Três Ave-Marias',
+      intro: 'Rezamos três Ave-Marias a Nossa Senhora das Graças.'
+    });
+    steps.push({ id: 'jacmaria', kind: 'prayer', p: 'jacmaria', section: sn, seg: 6 });
+    steps.push({ id: 'final', kind: 'prayer', p: 'final', section: sn, seg: 6 });
   }
   steps.push({
     id: 'sinal-fim', kind: 'prayer', section: 'Encerramento', seg: 6,
@@ -466,11 +478,12 @@ function viewHome() {
 
   return `<main class="page home" id="main">
     <figure class="hero">
-      <img src="${NS_IMG}" width="240" height="300"
+      <img src="${NS_IMG}" width="240" height="360"
         alt="Ilustração delicada de Nossa Senhora das Graças, de manto azul e braços abertos, com raios de luz saindo de suas mãos.">
     </figure>
     <h1 class="home-title" tabindex="-1">Minha Novena de Nossa Senhora das Graças</h1>
     <p class="subtitle">Nove dias de fé, oração e entrega.</p>
+    <p><a class="about-link" href="#sobre">Conheça a história da Medalha Milagrosa</a></p>
     ${ORNAMENT}
     <section class="progress-card" aria-label="Progresso da novena">
       <p class="progress-count"><strong>${done} de 9</strong> dias concluídos</p>
@@ -579,6 +592,11 @@ function viewDay(n) {
       <h2 class="card-title">Intenção do dia</h2>
       <p>${esc(d.intention)}</p>
     </section>
+    <details class="card">
+      <summary class="card-title">Meditação da novena · ${esc(d.meditationTitle)}</summary>
+      <p>${esc(d.meditation)}</p>
+      <p class="hint">Ela também aparece durante a oração.</p>
+    </details>
     <section class="card">
       <label class="card-title" for="personal">Minha intenção pessoal <span class="optional">(opcional)</span></label>
       <textarea id="personal" rows="3" data-input="personal" data-day="${n}" placeholder="Escreva aqui, se quiser, o que deseja confiar a Nossa Senhora hoje.">${esc(st.personal)}</textarea>
@@ -698,13 +716,12 @@ function viewFlow(key) {
       ? nextBtn
       : `<button class="btn btn-primary btn-big grow" data-action="count" aria-label="Rezei a Ave-Maria ${count + 1} de ${step.total}">REZEI ✓<small>Ave-Maria ${count + 1} de ${step.total}</small></button>`;
   } else if (step.kind === 'intention') {
-    const d = DAYS[session.day - 1];
     const st = state.days[session.day];
     const ints = state.intentions;
     body = `<p class="eyebrow">${esc(step.section)}</p>
       <h1 tabindex="-1">Intenção do dia</h1>
-      <p class="intro">Apresente com calma suas intenções a Nossa Senhora das Graças.</p>
-      <section class="card card-accent"><h2 class="card-title">${esc(d.title)}</h2><p>${esc(d.intention)}</p></section>
+      <p class="intro">Apresente com calma a graça que deseja alcançar. Depois da súplica, reze as três Ave-Marias.</p>
+      <section class="card card-accent"><h2 class="card-title">${esc(DAYS[session.day - 1].title)}</h2><p>${esc(DAYS[session.day - 1].intention)}</p></section>
       <section class="card">
         <label class="card-title" for="personal">Minha intenção pessoal <span class="optional">(opcional)</span></label>
         <textarea id="personal" rows="3" data-input="personal" data-day="${session.day}" placeholder="Escreva, se quiser.">${esc(st.personal)}</textarea>
@@ -752,7 +769,7 @@ function viewDone(which) {
   const next = nextDayAfter(n);
   const all = done === 9;
   return `<main class="page done-page" id="main">
-    <img class="done-img" src="${NS_IMG}" alt="" width="120" height="150">
+    <img class="done-img" src="${NS_IMG}" alt="" width="120" height="180">
     <p class="eyebrow">Dia ${n} de 9</p>
     <h1 tabindex="-1">${all ? 'Novena concluída' : 'Dia concluído'}</h1>
     ${ORNAMENT}
@@ -892,7 +909,7 @@ function viewPrayers() {
       <ol class="mystery-list">${s.items.map((m, i) => `<li><span class="m-ord">${ORDINALS[i]}</span> ${esc(m.title)} <span class="hint">(${esc(m.ref)})</span></li>`).join('')}</ol>
     </article>`;
   }).join('');
-  const days = DAYS.map(d => `<li><b>Dia ${d.n} — ${esc(d.title)}.</b> ${esc(d.intention)}</li>`).join('');
+  const days = DAYS.map(d => `<li><b>Dia ${d.n} — ${esc(d.title)}.</b> ${esc(d.intention)}<br><i>Meditação: ${esc(d.meditationTitle)}.</i> ${esc(d.meditation)}</li>`).join('');
 
   return `${topBar('#inicio', 'Início', 'Orações')}
   <main class="page prayers-page" id="main">
@@ -906,8 +923,9 @@ function viewPrayers() {
         <li>Sinal da Cruz</li><li>Invocação ao Espírito Santo</li><li>Oferecimento do Terço</li><li>Credo</li>
         <li>Pai-Nosso</li><li>Três Ave-Marias</li><li>Glória ao Pai</li>
         <li>Cinco dezenas: anúncio do mistério, Pai-Nosso, dez Ave-Marias, Glória ao Pai e Jaculatória de Fátima</li>
-        <li>Salve-Rainha</li><li>Intenção do dia</li><li>Oração a Nossa Senhora das Graças</li>
-        <li>Oração final da novena (Lembrai-vos)</li><li>Sinal da Cruz</li>
+        <li>Salve-Rainha</li><li>Ato de contrição</li><li>Meditação do dia</li><li>Súplica a Nossa Senhora</li>
+        <li>Três Ave-Marias e a jaculatória “Ó Maria concebida sem pecado”</li>
+        <li>Oração final</li><li>Sinal da Cruz</li>
       </ol>
     </section>
     ${prayers}
@@ -951,6 +969,17 @@ function viewSilence() {
     <p class="subtitle">Escolha um tempo, respire com calma e fique na presença de Deus.</p>
     ${ORNAMENT}
     ${timerWidget()}
+  </main>`;
+}
+
+function viewAbout() {
+  return `${topBar('#inicio', 'Início', 'Sobre')}
+  <main class="page" id="main">
+    <h1 tabindex="-1">Nossa Senhora das Graças</h1>
+    <p class="subtitle">A história da Medalha Milagrosa</p>
+    ${ORNAMENT}
+    ${ABOUT.map(a => `<section class="card"><h2 class="card-title">${esc(a.h)}</h2><p>${esc(a.p)}</p></section>`).join('')}
+    <div class="actions"><a class="btn btn-primary btn-block" href="#inicio">VOLTAR AO INÍCIO</a></div>
   </main>`;
 }
 
@@ -1020,6 +1049,7 @@ function render() {
     case 'ajustes': html = viewSettings(); break;
     case 'silencio': html = viewSilence(); break;
     case 'ajuda': html = viewHelp(); break;
+    case 'sobre': html = viewAbout(); break;
     default: html = viewNotFound();
   }
   if (!html) return;
@@ -1345,3 +1375,4 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
