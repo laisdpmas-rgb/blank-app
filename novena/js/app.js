@@ -29,6 +29,7 @@ function defaultState() {
       spacious: false,
       clean: false,
       jaculatoria: true,
+      rosary: 'ave', // novena: 'ave' (terço tradicional), 'jaculatoria' (terço da Medalha) ou 'nenhum'
       wakeLock: true
     }
   };
@@ -140,8 +141,21 @@ const ORNAMENT = `<svg class="ornament" viewBox="0 0 160 20" aria-hidden="true" 
 /* ---------------------------------------------------------
    3. Sequência do modo guiado (novena + terço)
    --------------------------------------------------------- */
+const ROSARY_OPTIONS = [
+  ['nenhum', 'Só a novena', 'Sem o terço.'],
+  ['ave', 'Novena com terço', 'Terço tradicional, com as Ave-Marias.'],
+  ['jaculatoria', 'Novena com terço da Medalha', 'Em cada conta, a jaculatória “Ó Maria concebida sem pecado” no lugar da Ave-Maria.']
+];
+
 function buildSteps(session) {
   const steps = [];
+  const rosary = session.rosary || 'ave';
+  if (rosary === 'nenhum') {
+    steps.push({ id: 'sinal-ini', kind: 'prayer', p: 'sinal', section: 'Abertura', seg: 0 });
+    steps.push({ id: 'espirito', kind: 'prayer', p: 'espirito', section: 'Abertura', seg: 0 });
+    novenaSteps(session, steps);
+    return closingStep(steps);
+  }
   const sec = 'Abertura do Terço';
   steps.push({ id: 'sinal-ini', kind: 'prayer', p: 'sinal', section: sec, seg: 0 });
   steps.push({ id: 'espirito', kind: 'prayer', p: 'espirito', section: sec, seg: 0 });
@@ -161,13 +175,20 @@ function buildSteps(session) {
     const s = `${ORDINALS[d]} ${set.singular}`;
     steps.push({ id: `mist-${d}`, kind: 'mystery', decade: d, section: s, seg: d + 1 });
     steps.push({ id: `pn-${d}`, kind: 'prayer', p: 'painosso', section: s, seg: d + 1 });
-    steps.push({ id: `ave-${d}`, kind: 'count', p: 'avemaria', total: 10, section: s, seg: d + 1, title: 'Dez Ave-Marias' });
+    steps.push(rosary === 'jaculatoria'
+      ? { id: `ave-${d}`, kind: 'count', p: 'jacmaria', unit: 'Jaculatória', total: 10, section: s, seg: d + 1, title: 'Dez jaculatórias' }
+      : { id: `ave-${d}`, kind: 'count', p: 'avemaria', total: 10, section: s, seg: d + 1, title: 'Dez Ave-Marias' });
     steps.push({ id: `gl-${d}`, kind: 'prayer', p: 'gloria', section: s, seg: d + 1 });
     steps.push({ id: `jac-${d}`, kind: 'prayer', p: 'jaculatoria', section: s, seg: d + 1, optional: 'jaculatoria' });
   }
 
   steps.push({ id: 'salve', kind: 'prayer', p: 'salve', section: 'Encerramento do Terço', seg: 6 });
-  if (session.mode === 'novena') {
+  if (session.mode === 'novena') novenaSteps(session, steps);
+  return closingStep(steps);
+}
+
+function novenaSteps(session, steps) {
+  {
     const sn = `Novena · Dia ${session.day}`;
     steps.push({ id: 'contricao', kind: 'prayer', p: 'contricao', section: sn, seg: 6 });
     steps.push({
@@ -185,6 +206,9 @@ function buildSteps(session) {
     steps.push({ id: 'jacmaria', kind: 'prayer', p: 'jacmaria', section: sn, seg: 6 });
     steps.push({ id: 'final', kind: 'prayer', p: 'final', section: sn, seg: 6 });
   }
+}
+
+function closingStep(steps) {
   steps.push({
     id: 'sinal-fim', kind: 'prayer', section: 'Encerramento', seg: 6,
     title: 'Sinal da Cruz',
@@ -602,9 +626,25 @@ function viewDay(n) {
       <textarea id="personal" rows="3" data-input="personal" data-day="${n}" placeholder="Escreva aqui, se quiser, o que deseja confiar a Nossa Senhora hoje.">${esc(st.personal)}</textarea>
       <p class="hint saved-hint" aria-live="polite"></p>
     </section>
-    ${session ? `<p class="hint">Mistérios desta oração: <b>${MYSTERIES[session.set].name}</b>.</p>` : mysterySelector(selected, auto)}
+    ${session ? sessionSummary(session) : rosaryChoice() + (state.settings.rosary === 'nenhum' ? '' : mysterySelector(selected, auto))}
     <div class="actions sticky-actions">${actions}</div>
   </main>`;
+}
+
+function rosaryChoice() {
+  const cur = state.settings.rosary;
+  return `<div class="setting rosary-choice">
+    <span class="setting-label" id="lbl-rosary">Como rezar hoje</span>
+    <div class="choice-list" role="radiogroup" aria-labelledby="lbl-rosary">
+      ${ROSARY_OPTIONS.map(([v, l, h]) => `<button role="radio" aria-checked="${cur === v}" class="choice ${cur === v ? 'on' : ''}" data-action="rosary" data-value="${v}">
+        <b>${l}</b><span>${h}</span></button>`).join('')}
+    </div>
+  </div>`;
+}
+
+function sessionSummary(session) {
+  const opt = ROSARY_OPTIONS.find(o => o[0] === (session.rosary || 'ave'));
+  return `<p class="hint">Oração em andamento: <b>${opt[1]}</b>${session.rosary === 'nenhum' ? '' : ` · ${MYSTERIES[session.set].name}`}.</p>`;
 }
 
 /* --- Terço Mariano (avulso) --- */
@@ -641,6 +681,7 @@ function viewTerco() {
 
 /* --- Modo guiado --- */
 function segmentTracker(step, session) {
+  if (session.rosary === 'nenhum') return '';
   const labels = ['Abertura', '1', '2', '3', '4', '5', 'Final'];
   return `<ol class="tracker" aria-hidden="true">${labels.map((l, i) =>
     `<li class="${i < step.seg ? 'past' : ''} ${i === step.seg ? 'now' : ''} ${i >= 1 && i <= 5 ? 'dec' : ''}">${l}</li>`).join('')}</ol>`;
@@ -692,16 +733,17 @@ function viewFlow(key) {
     primary = nextBtn;
   } else if (step.kind === 'count') {
     const count = Math.min(session.counts[step.id] || 0, step.total);
+    const unit = step.unit || 'Ave-Maria';
     const complete = count >= step.total;
     let beads = '';
     for (let i = 1; i <= step.total; i++) {
       const cls = i <= count ? 'done' : (i === count + 1 ? 'next' : '');
       const lab = step.labels ? `<span class="bead-label">${step.labels[i - 1]}</span>` : '';
-      beads += `<li><button class="bead ${cls}" data-action="set-count" data-n="${i}" aria-label="Ave-Maria ${i}${i <= count ? ', rezada' : ''}" aria-pressed="${i <= count}">${i}</button>${lab}</li>`;
+      beads += `<li><button class="bead ${cls}" data-action="set-count" data-n="${i}" aria-label="${unit} ${i}${i <= count ? ', rezada' : ''}" aria-pressed="${i <= count}">${i}</button>${lab}</li>`;
     }
     const heading = complete
       ? (step.total === 10 ? 'Dezena completa' : 'Três Ave-Marias rezadas')
-      : `Ave-Maria ${count + 1} de ${step.total}`;
+      : `${unit} ${count + 1} de ${step.total}`;
     body = `<p class="eyebrow">${esc(step.section)}</p>
       <h1 tabindex="-1">${esc(step.title)}</h1>
       ${step.intro ? `<p class="intro">${esc(step.intro)}</p>` : ''}
@@ -711,10 +753,10 @@ function viewFlow(key) {
         <button class="btn btn-text" data-action="undo-count" ${count ? '' : 'disabled'}>Desfazer a última</button>
         ${!complete ? `<button class="btn btn-text" data-action="next">Avançar etapa ›</button>` : ''}
       </div>
-      <div class="prayer-text ${complete ? 'muted-text' : ''}">${renderPrayerText(PRAYERS.avemaria.text)}</div>`;
+      <div class="prayer-text ${complete ? 'muted-text' : ''}">${renderPrayerText(PRAYERS[step.p].text)}</div>`;
     primary = complete
       ? nextBtn
-      : `<button class="btn btn-primary btn-big grow" data-action="count" aria-label="Rezei a Ave-Maria ${count + 1} de ${step.total}">REZEI ✓<small>Ave-Maria ${count + 1} de ${step.total}</small></button>`;
+      : `<button class="btn btn-primary btn-big grow" data-action="count" aria-label="Rezei: ${unit} ${count + 1} de ${step.total}">REZEI ✓<small>${unit} ${count + 1} de ${step.total}</small></button>`;
   } else if (step.kind === 'intention') {
     const st = state.days[session.day];
     const ints = state.intentions;
@@ -922,11 +964,12 @@ function viewPrayers() {
       <ol class="order-list">
         <li>Sinal da Cruz</li><li>Invocação ao Espírito Santo</li><li>Oferecimento do Terço</li><li>Credo</li>
         <li>Pai-Nosso</li><li>Três Ave-Marias</li><li>Glória ao Pai</li>
-        <li>Cinco dezenas: anúncio do mistério, Pai-Nosso, dez Ave-Marias, Glória ao Pai e Jaculatória de Fátima</li>
+        <li>Cinco dezenas: anúncio do mistério, Pai-Nosso, dez Ave-Marias (ou dez vezes a jaculatória “Ó Maria concebida sem pecado”, no terço da Medalha), Glória ao Pai e Jaculatória de Fátima</li>
         <li>Salve-Rainha</li><li>Ato de contrição</li><li>Meditação do dia</li><li>Súplica a Nossa Senhora</li>
         <li>Três Ave-Marias e a jaculatória “Ó Maria concebida sem pecado”</li>
         <li>Oração final</li><li>Sinal da Cruz</li>
       </ol>
+      <p class="hint">O terço é opcional. Na tela de cada dia você escolhe: só a novena (sem os itens 3 a 9), novena com terço ou novena com o terço da Medalha.</p>
     </section>
     ${prayers}
     <h2 class="section-title">Mistérios do Rosário</h2>
@@ -1079,6 +1122,7 @@ function startSession(key, mode, day) {
   const set = pendingSet[key] || todaysMysterySet();
   state.sessions[key] = {
     mode, day: day || null, set, step: 0, counts: {},
+    rosary: mode === 'novena' ? state.settings.rosary : 'ave',
     startedAt: new Date().toISOString(), updatedAt: new Date().toISOString()
   };
   delete pendingSet[key];
@@ -1195,6 +1239,7 @@ async function handleAction(btn) {
       }
       break;
     }
+    case 'rosary': state.settings.rosary = btn.dataset.value; save(); render(); break;
     case 'next': moveStep(1); break;
     case 'prev': moveStep(-1); break;
     case 'count': countAction('count'); break;

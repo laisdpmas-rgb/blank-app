@@ -17,7 +17,14 @@ Feito em HTML, CSS e JavaScript puros. Funciona sem internet depois da primeira 
 - **Conclusão do dia** com a mensagem: “Você concluiu mais um dia da sua novena. Que este momento de oração fortaleça sua fé.” Não há cobranças, contagem de dias perdidos nem notificações.
 - **Ajustes**: tamanho da letra (5 níveis), texto mais espaçado, aparência (automática, clara, *leitura confortável* em tom de papel, noturna), tela de oração limpa, leitura em tela cheia, manter a tela acesa durante a oração, cronômetro de oração silenciosa (1, 3, 5 ou 10 min), impressão das orações e reinício da novena com confirmação.
 
-### Ordem das orações em cada dia
+### Três formas de rezar cada dia
+
+Na tela de cada dia você escolhe, e o app lembra a escolha para os próximos dias:
+- **Só a novena**: Sinal da Cruz, Invocação ao Espírito Santo e as orações próprias da novena (itens 10 a 17 abaixo).
+- **Novena com terço**: o terço tradicional, com as Ave-Marias, seguido da novena.
+- **Novena com terço da Medalha**: igual, mas em cada uma das 10 contas de cada dezena reza-se a jaculatória “Ó Maria concebida sem pecado, rogai por nós que recorremos a vós” no lugar da Ave-Maria. É uma devoção popular, e a forma pode variar de lugar para lugar.
+
+### Ordem das orações (novena com terço)
 
 1. Sinal da Cruz
 2. Invocação ao Espírito Santo

@@ -174,6 +174,35 @@ const EXPECTED_OPENING = [
   check(total - withoutJac === 5, 'desativar a jaculatória remove 5 etapas');
   await p2.locator('[data-key="jaculatoria"]').click();
 
+  console.log('10b. Escolha: só a novena / terço da Medalha');
+  const shapes = await p2.evaluate(() => {
+    const t = r => buildSteps({ mode: 'novena', day: 2, set: 'gozosos', rosary: r }).map(x => x.id);
+    return { nenhum: t('nenhum'), jac: buildSteps({ mode: 'novena', day: 2, set: 'gozosos', rosary: 'jaculatoria' }).filter(x => x.id.startsWith('ave-') && x.total === 10).map(x => x.p) };
+  });
+  check(!shapes.nenhum.some(id => /^(mist|ave-\d|credo|salve)/.test(id)) && shapes.nenhum.includes('suplica') && shapes.nenhum[0] === 'sinal-ini', 'só a novena: sem terço, com as orações da novena');
+  check(shapes.jac.length === 5 && shapes.jac.every(p => p === 'jacmaria'), 'terço da Medalha: jaculatória nas 5 dezenas');
+  await p2.goto(BASE + '#dia-3');
+  await p2.locator('[data-action="rosary"][data-value="jaculatoria"]').click();
+  check(await p2.locator('#mset').isVisible(), 'terço da Medalha mostra os mistérios');
+  await p2.locator('[data-action="start-day"]').click();
+  await p2.waitForSelector('.flow');
+  for (let k = 0; k < 7; k++) { while (await p2.locator('[data-action="count"]').count()) await p2.locator('[data-action="count"]').click(); await p2.locator('.flow-nav .btn-primary').click(); }
+  await p2.locator('.flow-nav .btn-primary').click();
+  await p2.locator('.flow-nav .btn-primary').click();
+  check((await p2.locator('h1').first().innerText()) === 'Dez jaculatórias' && (await p2.locator('.count-status').innerText()) === 'Jaculatória 1 de 10', 'contador de jaculatórias');
+  check((await p2.locator('.flow-body .prayer-text').innerText()).includes('Ó Maria concebida sem pecado'), 'texto da jaculatória na dezena');
+  await p2.locator('[data-action="pause"]').click();
+  await p2.goto(BASE + '#dia-4');
+  await p2.locator('[data-action="rosary"][data-value="nenhum"]').click();
+  check(!(await p2.locator('#mset').count()), 'só a novena esconde os mistérios');
+  await p2.locator('[data-action="start-day"]').click();
+  await p2.waitForSelector('.flow');
+  check(!(await p2.locator('.tracker').count()) && (await p2.locator('.flow-where').innerText()).includes('de 10'), 'só a novena: 10 etapas, sem marcador de dezenas');
+  await p2.locator('[data-action="pause"]').click();
+  await p2.goto(BASE + '#dia-4');
+  check((await p2.locator('[data-action="rosary"]').count()) === 0 && (await p2.locator('main').innerText()).includes('Só a novena'), 'dia em andamento mostra a forma escolhida');
+  await p2.evaluate(() => { state.settings.rosary = 'ave'; delete state.sessions.d3; delete state.sessions.d4; save(); });
+
   console.log('11. Diário de intenções');
   await p2.goto(BASE + '#/intencoes');
   await p2.fill('#new-int', 'Que eu encontre um novo trabalho');

@@ -252,6 +252,15 @@ select { min-height: 48px; appearance: auto; }
 .verse p { font-family: var(--serif); font-style: italic; font-size: 1.12rem; color: var(--ink-soft); margin-bottom: .3rem; }
 .verse cite { font-size: .8rem; color: var(--gold); font-style: normal; letter-spacing: .05em; }
 .mystery-select { margin: 0 0 1rem; }
+.rosary-choice { margin: 0 0 1rem; }
+.choice-list { display: flex; flex-direction: column; gap: .5rem; }
+.choice {
+  display: flex; flex-direction: column; gap: .15rem; text-align: left; cursor: pointer; min-height: 56px;
+  padding: .7rem .9rem; border-radius: 14px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink);
+}
+.choice span { font-size: .85rem; color: var(--muted); }
+.choice.on { border-color: var(--blue); background: var(--blue-soft); box-shadow: 0 0 0 3px var(--blue-soft); }
+.choice.on b { color: var(--blue); }
 .mystery-select .setting-label { margin-bottom: .4rem; }
 .mystery-select .hint { margin: .45rem 0 0; }
 .sticky-actions {
